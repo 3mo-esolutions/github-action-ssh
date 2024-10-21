@@ -1,0 +1,28 @@
+name: SSH
+description: A GitHub Action to execute a SSH script on a remote server
+
+inputs:
+  SERVER:
+    description: The server string in the format username@host:port
+    required: true
+  SSH_KEY:
+    description: The SSH private key
+    required: true
+  SCRIPT:
+    description: The script to execute on the remote server
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - id: parse
+      uses: 3mo-esolutions/github-action-parse-server-credentials@0.1.0
+      with:
+        SERVER: ${{inputs.SERVER}}
+    - uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{steps.parse.outputs.HOST}}
+        port: ${{steps.parse.outputs.PORT}}
+        username: ${{steps.parse.outputs.USERNAME}}
+        key: ${{inputs.SSH_KEY}}
+        script: ${{inputs.SCRIPT}}
